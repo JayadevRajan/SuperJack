@@ -75,7 +75,7 @@ class SuperJackGame {
             let moneyOn = true;
          }
 
-         if (key = 131 | key = 32){
+         if ( (key = 131) | (key = 32) ){
             do superJack.jump();
          }
          

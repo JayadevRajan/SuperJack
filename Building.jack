@@ -59,6 +59,7 @@ class Building{
     let buildingHeights[5] = 90;
     let buildingHeights[6] = 50;
     let buildingHeights[7] = 60;
+    let buildingHeights[8] = 30;
     return;
   }
 
