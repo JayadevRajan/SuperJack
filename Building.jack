@@ -1,0 +1,153 @@
+class Building{
+
+  field int xPos;
+  field int yPos;
+
+  field int STEP;
+  field int WIDTH;
+  field int refreshRatio;
+  field int tickCount;
+  field int numBuildings;
+  field int counter;
+
+  field Array buildingPositions;
+  field Array buildingHeights;
+  field Array buildingWidths;
+
+  constructor Building new() {
+    let xPos = 0;
+    let yPos = 140;
+    let numBuildings = 8;
+    let WIDTH = (512 / numBuildings);
+    let refreshRatio = 8; //slow down the rendering for better graphics. 
+    let tickCount = 0; 
+    let counter = 0;
+      
+    let buildingPositions = Array.new( (numBuildings + 1 ) );
+    let buildingHeights = Array.new( (numBuildings + 1) ) ;
+    let buildingWidths = Array.new( (numBuildings + 1) ) ;
+    do initialize(false);
+    return this;
+  }
+
+  method void initialize(boolean skipHeights){
+    var int i;
+    let i = 1;
+
+    let buildingPositions[0] = 0;
+    let buildingWidths[0] = WIDTH;
+    while(i < numBuildings){
+      let buildingPositions[i] = buildingPositions[(i-1)] + WIDTH;
+      let buildingWidths[i] = WIDTH;
+      let i = i + 1;
+    }
+    let buildingPositions[numBuildings] = 511;
+    let buildingWidths[numBuildings] = 0;
+    
+    if(~skipHeights){
+      do initializeHeights();
+    }
+    return;
+  }
+
+  method void initializeHeights(){
+    let buildingHeights[0] = 30;
+    let buildingHeights[1] = 40;
+    let buildingHeights[2] = 70;
+    let buildingHeights[3] = 50;
+    let buildingHeights[4] = 80;
+    let buildingHeights[5] = 90;
+    let buildingHeights[6] = 50;
+    let buildingHeights[7] = 60;
+    return;
+  }
+
+  method void tick(){
+    let tickCount = tickCount + 1;
+    if( tickCount = 0){
+      do draw();
+    }
+    if( (tickCount = refreshRatio) ){
+      do clear();
+      let counter = counter + refreshRatio;
+      do updatePositions(refreshRatio);
+      do draw();
+      let tickCount = 0;
+    }
+    return;
+  }
+
+  method void updatePositions(int shiftBy){
+    var int i;
+    var int sHeight;
+
+    if(counter = WIDTH){
+      let sHeight = buildingHeights[0];
+      let i = 0;
+      while(i < numBuildings){
+        let buildingHeights[i] = buildingHeights[(i+1)];
+        let i = i + 1;
+      }
+      let buildingHeights[numBuildings] = sHeight;
+      do initialize(true);
+      
+      let counter = 0;
+    }else{
+      let i = 1;
+      while(i < numBuildings){
+        let buildingPositions[i] = buildingPositions[i] - shiftBy;
+        let i = i + 1;
+      }
+      let buildingPositions[0] = 0;
+      let buildingWidths[0] = buildingWidths[0] - shiftBy;
+      let buildingWidths[numBuildings] = buildingWidths[numBuildings] + shiftBy;
+    }
+    
+    return;
+  }
+
+  method void drawBuilding(){
+    var int i;
+    var int startX;
+    var int endX;
+    var int startY;
+    var int endY;
+    let i = 0;
+
+    while(i < (numBuildings + 1)){
+      let startX = buildingPositions[i];
+      let startY = (yPos - buildingHeights[i]);
+      let endX = (buildingPositions[i] + buildingWidths[i]);
+      let endY = yPos;      
+      if(isLegal(startX, startY, endX, endY)){
+        do Screen.drawRectangle(startX, startY, endX, endY);
+      }
+      let i = i + 1;
+    }
+    
+    return;
+  }
+
+  method void draw(){
+    do Screen.setColor(true);
+    do drawBuilding();
+    return;
+  }
+
+  method void clear(){
+    do Screen.setColor(false);
+    do drawBuilding();
+    return;
+  }
+
+  method boolean isLegal(int startX, int startY, int endX, int endY){
+    if( (startX > 511) | (endX > 511)){
+      return false;
+    }
+    if( (startX < 0) | (endX < 0) ){
+      return false;
+    }
+    return true;
+  }
+
+}

@@ -1,0 +1,86 @@
+class Money{
+
+  field int xPos;
+  field int yPos;
+
+  field int STEP;
+  constructor Money new(int aX, int aY) {
+    let xPos = aX;
+    let yPos = aY;
+    let STEP = 2;
+    return this;
+  }
+
+  /** Disposes this money. */
+  method void dispose() {
+    do Memory.deAlloc(this);
+    return;
+  }
+
+  method void draw(){
+    do drawBM(memAddress(), true);
+    return;
+  }
+
+  method void clear(){
+    do drawBM(memAddress(), false);
+    return;
+  }
+  
+  method boolean isInScreen(){
+    if(xPos < 20){
+      return false;
+    }else{
+      return true;
+    }
+  }
+
+  method void drawBM(int location, boolean clear){
+    var int memAddress;
+    let memAddress = 16384 + location;
+    do Memory.poke(memAddress+0, 0);
+    do Memory.poke(memAddress+32, 2016 & clear);
+    do Memory.poke(memAddress+64, 8184 & clear);
+    do Memory.poke(memAddress+96, 12300 & clear) ;
+    do Memory.poke(memAddress+128, 8196 & clear);
+    do Memory.poke(memAddress+160, 26406 & clear);
+    do Memory.poke(memAddress+192, 26790 & clear);
+    do Memory.poke(memAddress+224, 26790 & clear);
+    do Memory.poke(memAddress+256, 26790 & clear);
+    do Memory.poke(memAddress+288, 26406 & clear);
+    do Memory.poke(memAddress+320, 8196 & clear);
+    do Memory.poke(memAddress+352, 12300 & clear);
+    do Memory.poke(memAddress+384, 8184 & clear);
+    do Memory.poke(memAddress+416, 2016 & clear);
+    do Memory.poke(memAddress+448, 0);
+    do Memory.poke(memAddress+480, 0);
+    return;
+  }
+
+  method void tick(){
+    do clear();
+    let xPos = xPos - STEP;
+    do draw();
+    return;
+  }
+
+  method int memAddress(){
+    return ( (yPos - 16)  * 32) + (xPos/16);
+  }
+
+  method int getXStart(){
+    return (xPos - 8 );
+  }
+
+  method int getYStart(){
+    return ( yPos - 8 );
+  }
+
+  method int getXEnd(){
+    return (xPos + 8 );
+  }
+
+  method int getYEnd(){
+    return (yPos + 8 );
+  }
+}

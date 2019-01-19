@@ -1,0 +1,163 @@
+
+class SuperJackGame {
+
+   field SuperJack superJack; 
+   field int direction; 
+
+   field int XSIZE;
+   field int YSIZE;
+   field int DANGER_START;
+   field int WAIT_TIME;
+
+   field int DANGER_INTERVAL;
+   field int MONEY_INTERVAL;
+
+   constructor SuperJackGame new() {
+      let XSIZE = 512;
+      let YSIZE = 256;
+      let DANGER_START = XSIZE - 20;
+      let DANGER_INTERVAL =  521;
+      let MONEY_INTERVAL = 373;
+      let WAIT_TIME = 5;
+      let superJack = SuperJack.new(XSIZE/2, YSIZE - 20);
+      return this;
+   }
+
+   /** Disposes this game. */
+   method void dispose() {
+      do superJack.dispose();
+      do Memory.deAlloc(this);
+      return;
+   }
+
+   /** Runs the game: handles the user's inputs and moves the square accordingly */
+   method void run() {
+      var char key;  // the key currently pressed by the user
+      var boolean exit;
+      var Danger danger;
+      var Money money;
+      var Score score;
+      var Score message;
+      var Building building;
+      var boolean dangerOn, moneyOn;
+      var int dangerTime;
+      var int moneyTime;
+      var boolean xCol;
+      var boolean yCol;
+      var int xColI;
+      var int yColI;
+
+      let exit = false;
+      let dangerOn = false;
+      let moneyOn = false;
+      let dangerTime = 0;
+      let moneyTime = 0;
+
+      let score = Score.new(0);
+      let message = Score.new(1);
+      let building = Building.new();
+      while( ~exit){
+         let key = Keyboard.keyPressed();
+
+         if (key = 81)  {  // q key
+            let exit = true; 
+         }
+
+         if (dangerTime = DANGER_INTERVAL){
+            let dangerTime = 0;
+            let danger = Danger.new(DANGER_START,  YSIZE - 20);
+            let dangerOn = true; 
+         }
+
+         if(moneyTime = MONEY_INTERVAL){
+            let moneyTime = 0;
+            let money = Money.new(DANGER_START, YSIZE - 20);
+            let moneyOn = true;
+         }
+
+         if (key = 131 | key = 32){
+            do superJack.jump();
+         }
+         
+         do building.tick();
+         do superJack.tick();
+         
+         if(dangerOn){
+            if(~danger.isInScreen()){
+               do danger.clear();
+               do danger.dispose();
+               let dangerOn = false;
+            }else{
+               do danger.tick();
+               if( isColliding( danger, null )  ){ 
+                  let exit = true;
+                  do message.setMessage("GAME OVER");
+                  do message.tick();
+               }
+            }
+         }
+
+         if(moneyOn){
+            if(~money.isInScreen()){
+               do clearMoney(money);
+               let moneyOn = false;
+            }else{
+               do money.tick();
+               if( isColliding( null, money )  ){ 
+                  do message.setMessage("+1");
+                  do message.tick();
+                  do clearMoney(money);
+                  do score.setScore((score.getScore() + 1));
+                  let moneyOn = false;
+               }
+            }
+         }
+         do score.tick();
+
+         let dangerTime = dangerTime + 1;
+         let moneyTime = moneyTime + 1;
+         do Sys.wait(WAIT_TIME);
+      }
+     return;
+   }
+
+   method boolean isColliding(Danger danger, Money money){
+      var int x;
+      var int y;
+      var int xdash;
+      var int ydash;
+      var int xStart;
+      var in xEnd;
+      var int yStart;
+
+      let x = superJack.getXStart();
+      let xdash = superJack.getXEnd();
+      let y = superJack.getYStart();
+      let ydash = superJack.getYEnd();
+      if(money = null){
+         let xStart = danger.getXStart();
+         let xEnd = danger.getXEnd();
+         let yStart = danger.getYStart();
+      }else {
+         let xStart = money.getXStart();
+         let xEnd = money.getXEnd();
+         let yStart = money.getYStart();
+      }
+
+      if( xStart = x | xStart = xdash | xEnd = x | xEnd = xdash){
+         if ( ( (yStart > y) | (yStart = y)) & ( (yStart < ydash) | (yStart = ydash) )  ){
+            return true;
+         }
+      }
+      return false;
+   }
+
+   method void clearMoney(Money money){
+      do money.clear();
+      do money.dispose();
+      return;
+   }
+}
+
+
+

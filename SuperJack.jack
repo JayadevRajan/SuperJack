@@ -1,0 +1,154 @@
+
+class SuperJack{
+
+    field int xPos;
+    field int origYPos;
+    field int yPos;
+    field int XSIZE;
+    field int YSIZE;
+
+    field boolean isJumping;
+    field boolean up;
+    field int JUMPCYCLE;
+    field int currentJumpCounter;
+
+    constructor SuperJack new(int aX, int aY) {
+      let xPos = aX;
+      let origYPos = aY;
+      let yPos = aY;
+      let XSIZE = 10;
+      let YSIZE = 10;
+      let isJumping = false;
+      let JUMPCYCLE = 128;
+      let currentJumpCounter = 0;
+      return this;
+   }
+
+   /** Disposes this square. */
+   method void dispose() {
+      do Memory.deAlloc(this);
+      return;
+   }
+
+   method void drawUpperBM(int location) {
+      var int memAddress;
+      let memAddress = 16384+location;
+      do Memory.poke(memAddress+0, 0);
+      do Memory.poke(memAddress+32, 0);
+      do Memory.poke(memAddress+64, 0);
+      do Memory.poke(memAddress+96, 8184);
+      do Memory.poke(memAddress+128, 13308);
+      do Memory.poke(memAddress+160, 13308);
+      do Memory.poke(memAddress+192, 16380);
+      do Memory.poke(memAddress+224, 16380);
+      do Memory.poke(memAddress+256, 4092);
+      do Memory.poke(memAddress+288, 4092);
+      do Memory.poke(memAddress+320, 16380);
+      do Memory.poke(memAddress+352, 8184);
+      do Memory.poke(memAddress+384, 18402);
+      do Memory.poke(memAddress+416, 10212);
+      do Memory.poke(memAddress+448, 6120);
+      do Memory.poke(memAddress+480, 4080);
+      return;
+   }
+
+   method void drawLowerBM(int location){
+      var int memAddress;
+      let memAddress = 16384+location;
+      do Memory.poke(memAddress+0, 2016);
+      do Memory.poke(memAddress+32, 2016);
+      do Memory.poke(memAddress+64, 2016);
+      do Memory.poke(memAddress+96, 2016);
+      do Memory.poke(memAddress+128, 2016);
+      do Memory.poke(memAddress+160, 2016);
+      do Memory.poke(memAddress+192, 2016);
+      do Memory.poke(memAddress+224, 2016);
+      do Memory.poke(memAddress+256, 1584);
+      do Memory.poke(memAddress+288, 3096);
+      do Memory.poke(memAddress+320, 6156);
+      do Memory.poke(memAddress+352, 12294);
+      do Memory.poke(memAddress+384, 24579);
+      do Memory.poke(memAddress+416, 0);
+      do Memory.poke(memAddress+448, 0);
+      do Memory.poke(memAddress+480, 0);
+      return;
+   }
+
+   method void draw(){
+      do drawLowerBM(lowerMemAddress());
+      do drawUpperBM(upperMemAddress());
+      return;
+   }
+
+   method void clear(){
+      //drawing BM. 
+      return;
+   }
+
+   method int lowerMemAddress(){
+      return ( (yPos - 16)  * 32) + (xPos / 16);
+   }
+
+   method int upperMemAddress(){
+      return ( (yPos - 32)  * 32) + (xPos / 16);
+   }
+
+   method void tick(){
+      var int jumpMax;
+      do clear();
+      if(isJumping){
+         let jumpMax = JUMPCYCLE / 2;
+         if(currentJumpCounter = (jumpMax - 1) ) {
+            let up = false;
+         }
+         if(up){
+            let yPos = yPos - 1;
+         }
+         else{
+            let yPos = yPos + 1;
+         }
+
+         if(currentJumpCounter = JUMPCYCLE){
+            let isJumping = false;
+            let up = false;
+            let yPos = origYPos;
+         }
+         let currentJumpCounter = currentJumpCounter + 1;
+      }else{
+         let yPos = origYPos;
+      }
+      do draw();
+      return;
+   }
+
+   method void jump(){
+      if(isJumping){
+         return;
+      }
+      let isJumping = true;
+      let up = true;
+      let currentJumpCounter = 0;
+      return;
+   }
+
+   
+   method int getXStart(){
+    return ((xPos/16) * 16);
+   }
+
+   method int getYStart(){
+    return (yPos - 32);
+   }
+
+   method int getXEnd(){
+    var int start;
+    let start = getXStart();
+    return (start + 16);
+   }
+
+   method int getYEnd(){
+    var int start;
+    let start = getYStart();
+    return (start + 32);
+   }
+}

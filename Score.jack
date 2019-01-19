@@ -1,0 +1,58 @@
+class Score{
+
+  field int row;
+  field int score;
+  field String message;
+  constructor Score new(int aX) {
+    let score = 0;
+    let row = aX;
+    return this;
+  }
+
+  method void draw(){
+    var int length;
+    var int yColumn;
+    var char c;
+    var String scoreString;
+    let yColumn = 63;
+
+    let scoreString = String.new(10);
+    if(message = null){
+      do scoreString.setInt(score);
+    }else{
+      let scoreString = message;
+    }
+    
+    let length = scoreString.length();
+    while(length > 0){
+      let c = scoreString.charAt(length - 1);
+      do Output.moveCursor(row, yColumn);
+      do Output.printChar(c);
+
+      do scoreString.eraseLastChar();
+      let length = scoreString.length();
+      let yColumn = yColumn - 1;
+    }
+    do scoreString.dispose();
+    return;
+  }
+
+  method void tick(){
+    do draw();
+    return;
+  }
+
+  method void setScore(int n){
+    let score = n;
+    return;
+  }
+
+  method int getScore(){
+    return score;
+  }
+
+  method void setMessage(String mes){
+    let message = mes;
+    return;
+  }
+}

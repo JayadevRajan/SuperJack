@@ -1,0 +1,88 @@
+class Danger{
+
+  field int xPos;
+  field int yPos;
+
+  field int STEP;
+  constructor Danger new(int aX, int aY) {
+    let xPos = aX;
+    let yPos = aY;
+    let STEP = 2;
+    return this;
+  }
+
+  /** Disposes this square. */
+  method void dispose() {
+    do Memory.deAlloc(this);
+    return;
+  }
+
+  method void drawBM(int location, boolean clear ){
+    var int memAddress;
+    let memAddress = 16384+location;
+    do Memory.poke(memAddress+0, 4080  & clear);
+    do Memory.poke(memAddress+32, 4104 & clear);
+    do Memory.poke(memAddress+64, 8196 & clear);
+    do Memory.poke(memAddress+96, 9828 & clear);
+    do Memory.poke(memAddress+128, 9828 & clear);
+    do Memory.poke(memAddress+160, 8196 & clear);
+    do Memory.poke(memAddress+192, 9156 & clear);
+    do Memory.poke(memAddress+224, 8580 & clear);
+    do Memory.poke(memAddress+256, 8196 & clear);
+    do Memory.poke(memAddress+288, 9156 & clear);
+    do Memory.poke(memAddress+320, 8772 & clear);
+    do Memory.poke(memAddress+352, 4104 & clear);
+    do Memory.poke(memAddress+384, 4080 & clear);
+    do Memory.poke(memAddress+416, 30780 & clear);
+    do Memory.poke(memAddress+448, 16388 & clear);
+    do Memory.poke(memAddress+480, 16388 & clear);
+    return;
+  }
+
+  method void draw(){
+    do drawBM(memAddress(), true);
+    return;
+  }
+
+  method void clear(){
+    do drawBM(memAddress(), false);
+    return;
+  }
+  
+  method int memAddress(){
+    return ( (yPos - 16)  * 32) + (xPos/16);
+  }
+
+  method boolean isInScreen(){
+    if(xPos < 20){
+      return false;
+    }else{
+      return true;
+    }
+  }
+
+  method void tick(){
+    do clear();
+    let xPos = xPos - STEP;
+    do draw();
+    return;
+  }
+
+  method int getXStart(){
+    return ((xPos/16) * 16);
+  }
+
+  method int getYStart(){
+    return yPos - 16;
+  }
+
+  method int getXEnd(){
+    var int start;
+    let start = getXStart();
+    return (start + 16);
+  }
+
+  method int getYEnd(){
+    return yPos;
+  }
+}
