@@ -97,6 +97,7 @@ class SuperJack{
       var int jumpMax;
       do clear();
       if(isJumping){
+         //jump up and then down. 
          let jumpMax = JUMPCYCLE / 2;
          if(currentJumpCounter = (jumpMax - 1) ) {
             let up = false;
@@ -108,6 +109,7 @@ class SuperJack{
             let yPos = yPos + 1;
          }
 
+         //restore the original. 
          if(currentJumpCounter = JUMPCYCLE){
             let isJumping = false;
             let up = false;
@@ -121,6 +123,7 @@ class SuperJack{
       return;
    }
 
+   //Method called by controller on key Up or Space. 
    method void jump(){
       if(isJumping){
          return;

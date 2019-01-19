@@ -1,4 +1,5 @@
 
+//Super Jack Game Controller. 
 class SuperJackGame {
 
    field SuperJack superJack; 
@@ -16,6 +17,8 @@ class SuperJackGame {
       let XSIZE = 512;
       let YSIZE = 256;
       let DANGER_START = XSIZE - 20;
+
+      //Prime numbers so that they never collide. 
       let DANGER_INTERVAL =  521;
       let MONEY_INTERVAL = 373;
       let WAIT_TIME = 5;
@@ -30,7 +33,6 @@ class SuperJackGame {
       return;
    }
 
-   /** Runs the game: handles the user's inputs and moves the square accordingly */
    method void run() {
       var char key;  // the key currently pressed by the user
       var boolean exit;
@@ -56,6 +58,9 @@ class SuperJackGame {
       let score = Score.new(0);
       let message = Score.new(1);
       let building = Building.new();
+
+      //main loop, it calls vaious rendering classes to draw itself. 
+      //tick() is the method which is common across the classes. 
       while( ~exit){
          let key = Keyboard.keyPressed();
 
@@ -75,6 +80,7 @@ class SuperJackGame {
             let moneyOn = true;
          }
 
+         //Space or Up Key to jump up. 
          if ( (key = 131) | (key = 32) ){
             do superJack.jump();
          }
@@ -82,6 +88,7 @@ class SuperJackGame {
          do building.tick();
          do superJack.tick();
          
+         //if danger is in picture. 
          if(dangerOn){
             if(~danger.isInScreen()){
                do danger.clear();
@@ -97,6 +104,7 @@ class SuperJackGame {
             }
          }
 
+         //if money is in piture
          if(moneyOn){
             if(~money.isInScreen()){
                do clearMoney(money);
@@ -112,15 +120,30 @@ class SuperJackGame {
                }
             }
          }
+         //Update the score. 
          do score.tick();
 
          let dangerTime = dangerTime + 1;
          let moneyTime = moneyTime + 1;
          do Sys.wait(WAIT_TIME);
       }
+
+      do dispose();
+      if(moneyOn){
+         do clearMoney(money);
+      }
+      if(dangerOn){
+         do danger.clear();
+         do danger.dispose();
+      }
+      do building.dispose();
      return;
    }
 
+   /*
+    * Method to check whether the super jack is colliding with
+    * Danger or Coin. 
+    */
    method boolean isColliding(Danger danger, Money money){
       var int x;
       var int y;

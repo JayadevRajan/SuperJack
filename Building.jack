@@ -1,3 +1,5 @@
+//Building class that gives the impression of move 
+//it slows dows a bit for better graphics. 
 class Building{
 
   field int xPos;
@@ -23,11 +25,19 @@ class Building{
     let tickCount = 0; 
     let counter = 0;
       
+    //Maintains an array of buildings and positions. 
+    //The building array form a rolling view of the buildings that move across the screen. 
     let buildingPositions = Array.new( (numBuildings + 1 ) );
     let buildingHeights = Array.new( (numBuildings + 1) ) ;
     let buildingWidths = Array.new( (numBuildings + 1) ) ;
     do initialize(false);
     return this;
+  }
+
+  /** Disposes this money. */
+  method void dispose() {
+    do Memory.deAlloc(this);
+    return;
   }
 
   method void initialize(boolean skipHeights){
@@ -36,6 +46,7 @@ class Building{
 
     let buildingPositions[0] = 0;
     let buildingWidths[0] = WIDTH;
+    //Set the widths and positions starting from 0 - 511 
     while(i < numBuildings){
       let buildingPositions[i] = buildingPositions[(i-1)] + WIDTH;
       let buildingWidths[i] = WIDTH;
@@ -51,6 +62,7 @@ class Building{
   }
 
   method void initializeHeights(){
+    //Random heights. 
     let buildingHeights[0] = 30;
     let buildingHeights[1] = 40;
     let buildingHeights[2] = 70;
@@ -82,6 +94,8 @@ class Building{
     var int i;
     var int sHeight;
 
+    //One Building is out the picture. Shift the array by 1. 
+    //Set the last one to the first one. 
     if(counter = WIDTH){
       let sHeight = buildingHeights[0];
       let i = 0;
